@@ -19,18 +19,19 @@ class App:
         self.error = False
         self.main_url = 'https://www.instagram.com'
         self.all_images = []
+        self.no_of_posts = 0
         self.driver.get(self.main_url)
         sleep(3)
         self.log_in()
         if self.error is False:
             self.sweep_box()
-            self.open_target_profile()
+            self.shoot_target()
         if self.error is False:
             self.scroll_down()
         if self.error is False:
             if not os.path.exists(path):
                 os.mkdir(path)
-            self.downloading_images()
+            self.download_images()
         sleep(3)
         # self.driver.close()
 
@@ -59,7 +60,7 @@ class App:
             os.mkdir(captions_folder_path)
         self.write_captions_to_excel_file(images, captions_folder_path)
 
-    def downloading_images(self):
+    def download_images(self):
         self.all_images = list(set(self.all_images))
         self.download_captions(self.all_images)
         print('Length of all images', len(self.all_images))
@@ -81,7 +82,7 @@ class App:
         try:
             no_of_posts = self.driver.find_element_by_xpath('//span[text()=" posts"]').text
             no_of_posts = no_of_posts.replace(' posts', '')
-            no_of_posts = str(no_of_posts).replace(',', '')  # 15,483 --> 15483
+            no_of_posts = str(no_of_posts).replace(',', '')  # 2,156 --> 2156
             self.no_of_posts = int(no_of_posts)
             if self.no_of_posts > 12:
                 no_of_scrolls = int(self.no_of_posts / 12) + 3
@@ -98,11 +99,11 @@ class App:
                     print(e)
                     print('Some error occurred while trying to scroll down')
             sleep(10)
-        except Exception:
-            print('Could not find no of posts while trying to scroll down')
+        except Exception as e:
+            print('Could not find no of posts while trying to scroll down\n', e)
             self.error = True
 
-    def open_target_profile(self):
+    def shoot_target(self):
         try:
             search_bar = self.driver.find_element_by_xpath('//input[@placeholder="Search"]')
             search_bar.send_keys(self.target_username)
@@ -110,9 +111,9 @@ class App:
             self.driver.get(target_profile_url)
             sleep(3)
 
-        except Exception:
+        except Exception as e:
             self.error = True
-            print('Could not find search bar')
+            print('Could not find search bar\n', e)
 
     def sweep_box(self):
         # reload page
@@ -125,8 +126,8 @@ class App:
 
             not_now_btn.click()
             sleep(1)
-        except Exception:
-            pass
+        except Exception as e:
+            print(e)
 
     def close_settings_window_if_there(self):
         try:
@@ -134,7 +135,7 @@ class App:
             self.driver.close()
             self.driver.switch_to.window(self.driver.window_handles[0])
         except Exception as e:
-            pass
+            print(e)
 
     def log_in(self, ):
         try:
