@@ -1,5 +1,3 @@
-from telnetlib import EC
-
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from time import sleep
@@ -7,9 +5,6 @@ from openpyxl import Workbook
 import os
 import requests
 import shutil
-
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.wait import WebDriverWait
 
 
 class App:
@@ -123,7 +118,6 @@ class App:
         # reload page
         sleep(2)
         self.driver.get(self.driver.current_url)
-        sleep(3)
 
         try:
             not_now_btn = self.driver.find_element_by_xpath(
