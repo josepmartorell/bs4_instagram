@@ -1,0 +1,9 @@
+bs4
+selenium
+requests
+time
+openpyxl
+boto3
+shutil
+time
+os
