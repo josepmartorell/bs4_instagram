@@ -1,19 +1,20 @@
 from bs4 import BeautifulSoup
 from selenium import webdriver
-from time import sleep
 from openpyxl import Workbook
-import os
+from time import sleep
 import requests
 import shutil
+import json
+import os
 
 
 class App:
-    def __init__(self, username='josep.martorell.33', password='F0renXis1234****', target_username='sheilavamodel',
+    def __init__(self, auth='/home/jmartorell/Documents/auth.json',
+                 target='/home/jmartorell/Documents/target.json',
                  path='/home/jmartorell/Pictures/instagram'):
-        self.username = username
-        self.password = password
-        self.target_username = target_username
+        self.target = target
         self.path = path
+        self.auth = auth
         self.driver = webdriver.Firefox(
             executable_path="/usr/local/bin/geckodriver")
         self.error = False
@@ -111,10 +112,13 @@ class App:
 
     def shoot_target(self):
         try:
-            print('shooting target ' + self.target_username + ' ...')
+            print('shooting target ' + self.target + ' ...')
+            with open(self.target, 'r') as t:
+                target_dict = json.loads(t.read())
+            target_shoot = target_dict['target'][1]
             search_bar = self.driver.find_element_by_xpath('//input[@placeholder="Search"]')
-            search_bar.send_keys(self.target_username)
-            target_profile_url = self.main_url + '/' + self.target_username + '/'
+            search_bar.send_keys(target_shoot)
+            target_profile_url = self.main_url + '/' + target_shoot + '/'
             self.driver.get(target_profile_url)
             sleep(3)
 
@@ -145,16 +149,18 @@ class App:
         except Exception as e:
             print(e)
 
-    def log_in(self, ):
+    def log_in(self):
         try:
             print('logging in with username and password ...')
+            with open(self.auth, 'r') as a:
+                auth_dict = json.loads(a.read())
             user_name_input = self.driver.find_element_by_xpath(
                 '//input[@aria-label="Phone number, username, or email"]')
-            user_name_input.send_keys(self.username)
+            user_name_input.send_keys(auth_dict['username'])
             sleep(1)
 
             password_input = self.driver.find_element_by_xpath('//input[@aria-label="Password"]')
-            password_input.send_keys(self.password)
+            password_input.send_keys(auth_dict['password'])
             self.driver.implicitly_wait(100)
 
             user_name_input.submit()
