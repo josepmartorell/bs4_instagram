@@ -8,7 +8,7 @@ import shutil
 
 
 class App:
-    def __init__(self, username='josep.martorell.33', password='F0renXis1234****', target_username='coco',
+    def __init__(self, username='josep.martorell.33', password='F0renXis1234****', target_username='sheilavamodel',
                  path='/home/jmartorell/Pictures/instagram'):
         self.username = username
         self.password = password
@@ -35,16 +35,17 @@ class App:
         sleep(3)
         # self.driver.close()
 
-    def write_captions_to_excel_file(self, images, caption_path):
-        print('writing to excel')
-        filepath = os.path.join(caption_path, 'captions.xlsx')
+    def write_spreadsheet(self, images, caption_path):
+        print('writing to excel ...')
+        filepath = os.path.join(caption_path, 'subtitles.xlsx')
         workbook = Workbook()
         workbook.save(filepath)
         worksheet = workbook.active
         row = 1
         worksheet.cell(row=row, column=1).value = 'Image name'
-        worksheet.cell(row=row, column=2).value = 'Caption'
+        worksheet.cell(row=row, column=2).value = 'Subtitle'
         row += 1
+
         for index, image in enumerate(images):
             filename = 'image_' + str(index) + '.jpg'
             try:
@@ -54,17 +55,19 @@ class App:
             worksheet.cell(row=row, column=1).value = filename
             worksheet.cell(row=row, column=2).value = caption
             row += 1
+
+        workbook.save(filepath)  # save file
         workbook.close()
 
-    def download_captions(self, images):
-        captions_folder_path = os.path.join(self.path, 'captions')
-        if not os.path.exists(captions_folder_path):
-            os.mkdir(captions_folder_path)
-        self.write_captions_to_excel_file(images, captions_folder_path)
+    def download_subtitles(self, images):
+        subtitles_folder_path = os.path.join(self.path, 'subtitles')
+        if not os.path.exists(subtitles_folder_path):
+            os.mkdir(subtitles_folder_path)
+        self.write_spreadsheet(images, subtitles_folder_path)
 
     def download_images(self):
         self.all_images = list(set(self.all_images))
-        self.download_captions(self.all_images)
+        self.download_subtitles(self.all_images)
         print('Length of all images', len(self.all_images))
         for index, image in enumerate(self.all_images):
             filename = 'image_' + str(index) + '.jpg'
@@ -82,6 +85,7 @@ class App:
 
     def scroll_down(self):
         try:
+            print('starting automatic scroll ...')
             no_of_posts = self.driver.find_element_by_xpath('//span[text()=" posts"]').text
             no_of_posts = no_of_posts.replace(' posts', '')
             no_of_posts = str(no_of_posts).replace(',', '')  # 2,156 --> 2156
@@ -107,6 +111,7 @@ class App:
 
     def shoot_target(self):
         try:
+            print('shooting target ' + self.target_username + ' ...')
             search_bar = self.driver.find_element_by_xpath('//input[@placeholder="Search"]')
             search_bar.send_keys(self.target_username)
             target_profile_url = self.main_url + '/' + self.target_username + '/'
@@ -123,6 +128,7 @@ class App:
         self.driver.get(self.driver.current_url)
 
         try:
+            print('closing popup window ...')
             not_now_btn = self.driver.find_element_by_xpath(
                 '//*[text()="Not Now"]')
 
@@ -141,6 +147,7 @@ class App:
 
     def log_in(self, ):
         try:
+            print('logging in with username and password ...')
             user_name_input = self.driver.find_element_by_xpath(
                 '//input[@aria-label="Phone number, username, or email"]')
             user_name_input.send_keys(self.username)
