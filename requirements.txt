@@ -3,7 +3,7 @@ selenium
 requests
 time
 openpyxl
-boto3
+json
 shutil
 time
 os
