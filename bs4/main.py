@@ -37,11 +37,13 @@ class App:
 
     def write_captions_to_excel_file(self, images, caption_path):
         print('writing to excel')
-        workbook = Workbook(os.path.join(caption_path, 'captions.xlsx'))
-        worksheet = workbook.add_worksheet()
-        row = 0
-        worksheet.write(row, 0, 'Image name')  # 3 --> row number, column number, value
-        worksheet.write(row, 1, 'Caption')
+        filepath = os.path.join(caption_path, 'captions.xlsx')
+        workbook = Workbook()
+        workbook.save(filepath)
+        worksheet = workbook.active
+        row = 1
+        worksheet.cell(row=row, column=1).value = 'Image name'
+        worksheet.cell(row=row, column=2).value = 'Caption'
         row += 1
         for index, image in enumerate(images):
             filename = 'image_' + str(index) + '.jpg'
@@ -49,8 +51,8 @@ class App:
                 caption = image['alt']
             except KeyError:
                 caption = 'No caption exists'
-            worksheet.write(row, 0, filename)
-            worksheet.write(row, 1, caption)
+            worksheet.cell(row=row, column=1).value = filename
+            worksheet.cell(row=row, column=2).value = caption
             row += 1
         workbook.close()
 
@@ -146,7 +148,7 @@ class App:
 
             password_input = self.driver.find_element_by_xpath('//input[@aria-label="Password"]')
             password_input.send_keys(self.password)
-            sleep(1)
+            self.driver.implicitly_wait(100)
 
             user_name_input.submit()
             sleep(1)
