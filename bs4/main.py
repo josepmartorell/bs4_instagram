@@ -1,4 +1,5 @@
 from bs4 import BeautifulSoup
+from openpyxl.styles import Font
 from selenium import webdriver
 from openpyxl import Workbook
 from time import sleep
@@ -42,11 +43,18 @@ class App:
         workbook = Workbook()
         workbook.save(filepath)
         worksheet = workbook.active
+        # set style sheet
+        worksheet.column_dimensions['A'].width = 15
+        worksheet.column_dimensions['B'].width = 40000
+        format = worksheet.column_dimensions['A']
+        format.font = Font(bold=True, italic=True, name='Arial')
+        format = worksheet.column_dimensions['B']
+        format.font = Font(bold=True, italic=True, name='Arial')
+        # write on spreadsheet
         row = 1
         worksheet.cell(row=row, column=1).value = 'Image name'
         worksheet.cell(row=row, column=2).value = 'Subtitle'
         row += 1
-
         for index, image in enumerate(images):
             filename = 'image_' + str(index) + '.jpg'
             try:
@@ -56,7 +64,7 @@ class App:
             worksheet.cell(row=row, column=1).value = filename
             worksheet.cell(row=row, column=2).value = caption
             row += 1
-
+        # save work
         workbook.save(filepath)  # save file
         workbook.close()
 
@@ -116,7 +124,7 @@ class App:
         try:
             with open(self.target, 'r') as t:
                 target_dict = json.loads(t.read())
-            target_shoot = target_dict['target'][0]
+            target_shoot = target_dict['target'][1]
             print('Shooting target ' + target_shoot + ' ...')
             search_bar = self.driver.find_element_by_xpath('//input[@placeholder="Search"]')
             search_bar.send_keys(target_shoot)
