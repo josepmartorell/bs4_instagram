@@ -3,4 +3,4 @@ Instagram is a social network and a mobile application at the same time which al
 
 This application allows you to track instagram followers and extract images to store them in a folder along with a spreadsheet with its subtitles automatically written.  
 
-Make responsible use.
+Make responsible use. :camera:
