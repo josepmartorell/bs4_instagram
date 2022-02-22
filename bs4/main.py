@@ -8,11 +8,13 @@ import shutil
 import json
 import os
 
+from selenium.webdriver.common.by import By
+
 
 class App:
-    def __init__(self, auth='/home/jmartorell/Documents/auth.json',
-                 target='/home/jmartorell/Documents/target.json',
-                 path='/home/jmartorell/Pictures/instagram'):
+    def __init__(self, auth='/home/jtech/Documents/auth.json',
+                 target='/home/jtech/Documents/target.json',
+                 path='/home/jtech/Pictures/instagram'):
         self.target = target
         self.path = path
         self.auth = auth
@@ -24,11 +26,12 @@ class App:
         self.no_of_posts = 0
         self.driver.get(self.main_url)
         sleep(3)
+        self.sweep_box()
         self.log_in()
         if self.error is False:
-            self.sweep_box()
             self.shoot_target()
         if self.error is False:
+            sleep(3)
             self.scroll_down()
         if self.error is False:
             if not os.path.exists(path):
@@ -96,8 +99,8 @@ class App:
 
     def scroll_down(self):
         try:
-            no_of_posts = self.driver.find_element_by_xpath('//span[text()=" posts"]').text
-            no_of_posts = no_of_posts.replace(' posts', '')
+            no_of_posts = self.driver.find_element(By.XPATH, '//ul/li[1]/div/span').text
+            print("No of Posts: ", no_of_posts)
             no_of_posts = str(no_of_posts).replace(',', '')  # 2,156 --> 2156
             self.no_of_posts = int(no_of_posts)
             if self.no_of_posts > 12:
@@ -126,7 +129,7 @@ class App:
                 target_dict = json.loads(t.read())
             target_shoot = target_dict['target'][1]
             print('Shooting target ' + target_shoot + ' ...')
-            search_bar = self.driver.find_element_by_xpath('//input[@placeholder="Search"]')
+            search_bar = self.driver.find_element(By.XPATH, '//input[@placeholder="Search"]')
             search_bar.send_keys(target_shoot)
             target_profile_url = self.main_url + '/' + target_shoot + '/'
             self.driver.get(target_profile_url)
@@ -138,13 +141,13 @@ class App:
 
     def sweep_box(self):
         # reload page
-        sleep(2)
-        self.driver.get(self.driver.current_url)
+        # sleep(2)
+        # self.driver.get(self.driver.current_url)
 
         try:
             print('Closing popup window ...')
-            not_now_btn = self.driver.find_element_by_xpath(
-                '//*[text()="Not Now"]')
+            not_now_btn = self.driver.find_element(By.XPATH,
+                                                   '//*[text()="Accept All"]')
 
             not_now_btn.click()
             sleep(1)
@@ -164,12 +167,12 @@ class App:
             print('Logging in with username and password ...')
             with open(self.auth, 'r') as a:
                 auth_dict = json.loads(a.read())
-            user_name_input = self.driver.find_element_by_xpath(
-                '//input[@aria-label="Phone number, username, or email"]')
+            user_name_input = self.driver.find_element(By.XPATH,
+                                                       '//input[@aria-label="Phone number, username, or email"]')
             user_name_input.send_keys(auth_dict['username'])
             sleep(1)
 
-            password_input = self.driver.find_element_by_xpath('//input[@aria-label="Password"]')
+            password_input = self.driver.find_element(By.XPATH, '//input[@aria-label="Password"]')
             password_input.send_keys(auth_dict['password'])
             self.driver.implicitly_wait(100)
 
